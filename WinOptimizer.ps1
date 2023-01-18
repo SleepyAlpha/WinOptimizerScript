@@ -79,7 +79,6 @@ $Services = @(
                 "FontCache"                                    # Windows font cache
                 "gupdate"                                      # Google Update
                 "gupdatem"                                     # Another Google Update Service
-                "iphlpsvc"                                     # ipv6(Most websites use ipv4 instead)
                 "lfsvc"                                        # Geolocation Service
                 "lmhosts"                                      # TCP/IP NetBIOS Helper
                 "MapsBroker"                                   # Downloaded Maps Manager
