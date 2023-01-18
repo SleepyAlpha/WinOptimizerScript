@@ -248,10 +248,6 @@ Write-Host "Disabling HPET."
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" -Name "GPU Priority" -Type DWord -Value 8
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" -Name "Priority" -Type DWord -Value 6
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" -Name "Scheduling Category" -Type String -Value "High"
-        
-            # Group svchost.exe processes
-            $ram = (Get-CimInstance -ClassName Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1kb
-            Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "SvcHostSplitThresholdInKB" -Type DWord -Value $ram -Force
 
 Write-Host "Disable News and Interests."
             If (!(Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds")) {
@@ -351,7 +347,6 @@ $Bloatware = @(
                 "*Royal Revolt*"
                 "*Sway*"
                 "*Speed Test*"
-                "*Dolby*"
                 "*Viber*"
                 "*ACGMediaPlayer*"
                 "*Netflix*"
@@ -378,10 +373,6 @@ $Bloatware = @(
                 "*Microsoft.MicrosoftStickyNotes*"
 		        "*MicrosoftCorporationII.QuickAssist*"
 		        "*Microsoft.PowerAutomateDesktop*"
-                "TCUI"
-                "XboxGameOverlay"
-                "XboxGameCallableUI"
-                "XboxSpeechToTextOverlay"
             )
 
 Write-Host "Removing Bloatware."
@@ -1930,6 +1921,7 @@ Write-Host "Removing Dependencies."
                 Write-Host "Removing $Dep."
                 winget uninstall $Dep
             }
+
 
 Write-Host "Cleaning Windows."
                 Get-ChildItem -Path "C:\Windows\Temp" *.* -Recurse | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
