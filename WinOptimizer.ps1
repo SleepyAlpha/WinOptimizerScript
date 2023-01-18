@@ -1,3 +1,4 @@
+#Version 23.1 Gaming Beta
 # Big shoutout to Chris Titus for providing much of the code used in this project.
 # https://christitus.com/ | https://github.com/ChrisTitusTech | https://www.youtube.com/c/ChrisTitusTech
 
@@ -1935,6 +1936,9 @@ $AppList = @(
 	    	Write-Host "Installing $App."
 		    winget install --force --silent --accept-package-agreements --accept-source-agreements $App
         }
+
+Write-Host "Disabling Multi-Plane Overlay."
+            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\Dwm" -Name "OverlayTestMode" -Type Dword -Value 5
 
 Write-Host "Cleaning Windows."
                 Get-ChildItem -Path "C:\Windows\Temp" *.* -Recurse | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
