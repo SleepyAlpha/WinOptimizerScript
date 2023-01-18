@@ -1922,6 +1922,19 @@ Write-Host "Removing Dependencies."
                 winget uninstall $Dep
             }
 
+$AppList = @(
+                "Discord.Discord"                   # Discord
+                "Valve.Steam"                       # Steam Client
+                "ElectronicArts.EADesktop"          # EA Play
+                "Ubisoft.Connect"                   # Ubisoft
+                "EpicGames.EpicGamesLauncher"       # Epic Games Client
+                "GOG.Galaxy"                        # Gog Galaxy
+            )
+
+	    foreach ($App in $AppList) {
+	    	Write-Host "Installing $App."
+		    winget install --force --silent --accept-package-agreements --accept-source-agreements $App
+        }
 
 Write-Host "Cleaning Windows."
                 Get-ChildItem -Path "C:\Windows\Temp" *.* -Recurse | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
