@@ -1,4 +1,4 @@
-#Version 23.1 Gaming Beta
+#Version 23.1 Gaming
 # Big shoutout to Chris Titus for providing much of the code used in this project.
 # https://christitus.com/ | https://github.com/ChrisTitusTech | https://www.youtube.com/c/ChrisTitusTech
 
