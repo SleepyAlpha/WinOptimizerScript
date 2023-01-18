@@ -47,6 +47,9 @@ Write-Host "Disabling Location Tracking."
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}" -Name "SensorPermissionState" -Type DWord -Value 0
             Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration" -Name "Status" -Type DWord -Value 0
 
+Write-Host "Setting Classic Right-Click Menu..."
+            New-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" -Name "InprocServer32" -force -value ""
+
 Write-Host "Setting DNS to Cloud Flare for all connections."
             $DC = "1.1.1.1"
             $Internet = "1.0.0.1"
