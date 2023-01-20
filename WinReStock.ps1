@@ -5,17 +5,6 @@
 Read-Host -Prompt "WARNING: The Computer Will Reboot When Execution Concludes, Press Enter to Continue"
 
 
-$Deps = @(
-            "9P7KNL5RWT25"  # Sysinternals Suite
-        )
-
-Write-Host "Installing Dependencies"
-        foreach ($Dep in $Deps){
-            Write-Host "Installing $Dep."
-		    winget install --silent --accept-package-agreements --accept-source-agreements $Dep
-        }
-
-
 Write-Host "Enabling GameDVR"
             If (!(Test-Path "HKCU:\System\GameConfigStore")) {
                  New-Item -Path "HKCU:\System\GameConfigStore" -Force
@@ -274,12 +263,6 @@ Write-Host "Removing WinOptimizer Firewall Rules."
 
            Remove-NetFirewallRule -DisplayName "TelDisable*" 
 
-
-Write-Host "Removing Dependencies."
-            foreach ($Dep in $Deps){
-                Write-Host "Removing $Dep."
-                winget uninstall $Dep
-            }
 
 
 Write-Host "Reset Multi-Plane Overlay."
