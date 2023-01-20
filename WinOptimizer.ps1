@@ -1,4 +1,4 @@
-#Version 23.1 Gaming
+#Version 23.1.2 Gaming
 # Big shoutout to Chris Titus for providing much of the code used in this project.
 # https://christitus.com/ | https://github.com/ChrisTitusTech | https://www.youtube.com/c/ChrisTitusTech
 
@@ -453,7 +453,6 @@ $IpList = @(
                 "40.126.41.96"
                 "40.126.41.160"
                 "51.104.136.2"
-                #"51.105.218.222" # Conflicts with Microsoft Edge syncronization, uncomment if using other browser.
                 "51.140.40.236"
                 "51.140.157.153"
                 "51.143.53.152"
