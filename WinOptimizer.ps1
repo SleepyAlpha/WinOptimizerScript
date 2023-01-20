@@ -1,4 +1,4 @@
-# WinOptimizer 23.1.2
+# WinOptimizer 23.1.3
 # Big shoutout to Chris Titus for providing much of the code used in this project.
 # https://christitus.com/ | https://github.com/ChrisTitusTech | https://www.youtube.com/c/ChrisTitusTech
 
@@ -373,11 +373,6 @@ Write-Host "Removing Bloatware."
 Write-Host "Removing Widgets."
 		    winget uninstall "Windows web experience Pack"
 
-Write-Host "Disabling PowerThrottle."
-            If (Test-Path "HKLM:\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling") {
-                Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling" -Name "PowerThrottlingOff" -Type DWord -Value 00000001
-            }
-                Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power" -Name "HiberbootEnabled" -Type DWord -Value 0000000
 
 Write-Host "Disabling mouse acceleration."
             Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseSpeed" -Type String -Value 0
