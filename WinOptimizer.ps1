@@ -1,4 +1,4 @@
-# WinOptimizer 23.1.2 Gaming
+# WinOptimizer 23.1.3 Gaming
 # Big shoutout to Chris Titus for providing much of the code used in this project.
 # https://christitus.com/ | https://github.com/ChrisTitusTech | https://www.youtube.com/c/ChrisTitusTech
 
@@ -44,11 +44,8 @@ Write-Host "Setting Classic Right-Click Menu..."
             New-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" -Name "InprocServer32" -force -value ""
 
 Write-Host "Setting DNS to Cloud Flare for all connections."
-            $DC = "1.1.1.1"
-            $Internet = "1.0.0.1"
-            $dns = "$DC", "$Internet"
-            $Interface = Get-WmiObject Win32_NetworkAdapterConfiguration 
-            $Interface.SetDNSServerSearchOrder($dns)  | Out-Null
+            Get-NetAdapter | set-DnsClientServerAddress -ServerAddresses ("1.1.1.1","1.0.0.1")
+
 
 Write-Host "Disabling automatic Maps updates."
             Set-ItemProperty -Path "HKLM:\SYSTEM\Maps" -Name "AutoUpdateEnabled" -Type DWord -Value 0
@@ -368,11 +365,6 @@ Write-Host "Removing Bloatware."
 Write-Host "Removing Widgets."
 		    winget uninstall "Windows web experience Pack"
 
-Write-Host "Disabling PowerThrottle."
-            If (Test-Path "HKLM:\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling") {
-                Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling" -Name "PowerThrottlingOff" -Type DWord -Value 00000001
-            }
-                Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power" -Name "HiberbootEnabled" -Type DWord -Value 0000000
 
 Write-Host "Disabling mouse acceleration."
             Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseSpeed" -Type String -Value 0
