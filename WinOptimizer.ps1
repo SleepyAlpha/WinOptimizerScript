@@ -14,6 +14,12 @@ Write-Host "Installing Dependencies"
 		            winget install --silent --accept-package-agreements --accept-source-agreements $Dep
         }
 
+Write-Host  "Disabling Background Apps"
+            If (!(Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy")) {
+                 New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" -Force
+            }
+            Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" -Name "LetAppsRunInBackground" -Type DWord -Value 2
+
 Write-Host  "Disabling Bing Search"
             If (!(Test-Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer")) {
                  New-Item -Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer" -Force
