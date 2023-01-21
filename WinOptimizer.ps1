@@ -14,6 +14,12 @@ Write-Host "Installing Dependencies"
 		            winget install --silent --accept-package-agreements --accept-source-agreements $Dep
         }
 
+Write-Host  "Disabling Bing Search"
+            If (!(Test-Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer")) {
+                 New-Item -Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer" -Force
+            }
+            Set-ItemProperty -Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer" -Name "DisableSearchBoxSuggestions" -Type DWord -Value 1
+
 Write-Host  "Enabling Windows 11 Education Themes"
             If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\Education")) {
                  New-Item -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\Education" -Force
