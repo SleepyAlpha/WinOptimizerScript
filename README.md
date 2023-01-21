@@ -34,3 +34,5 @@ Disable HPET.
 Restores old context menu.
 
 Several network tweaks including setting all network interfaces to CloudFlare DNS servers.
+
+Enabled Education Themes.
