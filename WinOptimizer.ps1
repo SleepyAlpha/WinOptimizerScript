@@ -9,9 +9,9 @@ $Deps = @(
         )
 
 Write-Host "Installing Dependencies"
-        foreach ($Dep in $Deps){
-            Write-Host "Installing $Dep."
-		    winget install --silent --accept-package-agreements --accept-source-agreements $Dep
+            foreach ($Dep in $Deps){
+                    Write-Host "Installing $Dep."
+		            winget install --silent --accept-package-agreements --accept-source-agreements $Dep
         }
 
 Write-Host "Disabling GameDVR"
