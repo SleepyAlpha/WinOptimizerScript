@@ -7,6 +7,9 @@ Read-Host -Prompt "WARNING: The Computer Will Reboot When Execution Concludes, P
 Write-Host "Disabling Windows 11 Education Themes"
             Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\Education" -Force -ErrorAction SilentlyContinue
 
+Write-Host  "Enabling Bing Search"
+            Remove-Item -Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer" -Force -ErrorAction SilentlyContinue
+
 Write-Host "Enabling GameDVR"
             If (!(Test-Path "HKCU:\System\GameConfigStore")) {
                  New-Item -Path "HKCU:\System\GameConfigStore" -Force
