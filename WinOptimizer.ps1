@@ -587,6 +587,9 @@ $AppList = @(
 		    winget install --force --silent --accept-package-agreements --accept-source-agreements $App
         }
 
+Write-Host "Disabling Multi-Plane Overlay."
+            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\Dwm" -Name "OverlayTestMode" -Type Dword -Value 5
+	    
 Write-Host "Cleaning Windows."
                 Get-ChildItem -Path "C:\Windows\Temp" *.* -Recurse | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
                 Get-ChildItem -Path $env:TEMP *.* -Recurse | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
