@@ -33,6 +33,6 @@ Disable HPET.
 
 Restores old context menu.
 
-Several network tweaks including setting all network interfaces to CloudFlare DNS servers.
+Several network tweaks including setting all network interfaces to CloudFlare Anti-Malware DNS servers.
 
 Enabled Education Themes.
