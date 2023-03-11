@@ -1,4 +1,4 @@
-# WinOptimizer 23.1.3 Gaming
+# WinOptimizer 23.3.1 Gaming
 # Big shoutout to Chris Titus for providing much of the code used in this project.
 # https://christitus.com/ | https://github.com/ChrisTitusTech | https://www.youtube.com/c/ChrisTitusTech
 
@@ -9,9 +9,10 @@ $Deps = @(
         )
 
 Write-Host "Installing Dependencies"
+        winget source reset --force
         foreach ($Dep in $Deps){
             Write-Host "Installing $Dep."
-		    winget install --silent --accept-package-agreements --accept-source-agreements $Dep
+		    winget install $Dep --silent --accept-package-agreements --accept-source-agreements
         }
 
 Write-Host  "Disabling Background Apps"
@@ -61,8 +62,9 @@ Write-Host "Disabling Hibernation."
 Write-Host "Setting Classic Right-Click Menu..."
             New-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" -Name "InprocServer32" -force -value ""
 
-Write-Host "Setting DNS to Cloud Flare for all connections."
-            Get-NetAdapter | set-DnsClientServerAddress -ServerAddresses ("1.1.1.1","1.0.0.1")
+Write-Host "Setting DNS to anti-malware Cloud Flare for all connections."
+            Get-NetAdapter | set-DnsClientServerAddress -ServerAddresses ("1.1.1.2","1.0.0.2")
+            Get-NetAdapter | set-DnsClientServerAddress –ServerAddresses ("2606:4700:4700::1112", "2606:4700:4700::1002")
 
 
 Write-Host "Disabling automatic Maps updates."
@@ -150,10 +152,10 @@ Write-Host "Disabling Telemetry."
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
             Disable-ScheduledTask -TaskName "Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" | Out-Null
-            Disable-ScheduledTask -TaskName "Microsoft\Windows\Application Experience\PcaPatchDbTask" | Out-Null
             
             # Forced to use psexec to start powershell as SYSTEM, otherwise the following line fails with permission denied error.
             psexec.exe -i -s powershell.exe -Command "Disable-ScheduledTask -TaskName Microsoft\Windows\'Application Experience'\SdbinstMergeDbTask"
+            psexec.exe -i -s powershell.exe -Command "Disable-ScheduledTask -TaskName Microsoft\Windows\'Application Experience'\PcaPatchDbTask"
             
             Disable-ScheduledTask -TaskName "Microsoft\Windows\Application Experience\StartupAppTask" | Out-Null
             Disable-ScheduledTask -TaskName "Microsoft\Windows\Autochk\Proxy" | Out-Null
@@ -286,7 +288,7 @@ Write-Host "Disabling Wi-Fi Sense."
 
 $Bloatware = @(
                 "Microsoft.WindowsCamera"
-		"Microsoft.549981C3F5F10"
+		        "Microsoft.549981C3F5F10"
                 "Microsoft.3DBuilder"
                 "Microsoft.Microsoft3DViewer"
                 "Microsoft.AppConnector"
@@ -369,8 +371,8 @@ $Bloatware = @(
                 "*Microsoft.Advertising.Xaml*"
                 "*Microsoft.MSPaint*"
                 "*Microsoft.MicrosoftStickyNotes*"
-		"*MicrosoftCorporationII.QuickAssist*"
-		"*Microsoft.PowerAutomateDesktop*"
+		        "*MicrosoftCorporationII.QuickAssist*"
+		        "*Microsoft.PowerAutomateDesktop*"
             )
 
 Write-Host "Removing Bloatware."
