@@ -64,7 +64,7 @@ Write-Host "Setting Classic Right-Click Menu..."
 
 Write-Host "Setting DNS to anti-malware Cloud Flare for all connections."
             Get-NetAdapter | set-DnsClientServerAddress -ServerAddresses ("1.1.1.2","1.0.0.2")
-            Get-NetAdapter | set-DnsClientServerAddress –ServerAddresses ("2606:4700:4700::1112", "2606:4700:4700::1002")
+            Get-NetAdapter | set-DnsClientServerAddress -ServerAddresses ("2606:4700:4700::1112", "2606:4700:4700::1002")
 
 Write-Host "Disabling automatic Maps updates."
             Set-ItemProperty -Path "HKLM:\SYSTEM\Maps" -Name "AutoUpdateEnabled" -Type DWord -Value 0
