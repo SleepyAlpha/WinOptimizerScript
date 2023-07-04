@@ -203,10 +203,6 @@ Write-Host "Stopping and disabling WAP Push Service."
 Write-Host "Disabling Remote Assistance."
             Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance" -Name "fAllowToGetHelp" -Type DWord -Value 0
 
-Write-Host "Stopping and disabling Superfetch service."
-            Stop-Service "SysMain" -WarningAction SilentlyContinue
-            Set-Service "SysMain" -StartupType Disabled
-
 Write-Host "Changing default Explorer view to This PC."
             Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "LaunchTo" -Type DWord -Value 1
         
