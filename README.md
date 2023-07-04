@@ -29,8 +29,6 @@ Disable mouse acceleration.
 
 Removes Windows Widgets and Cortana.
 
-Disable HPET.
-
 Restores old context menu.
 
 Several network tweaks including setting all network interfaces to CloudFlare Anti-Malware DNS servers.
