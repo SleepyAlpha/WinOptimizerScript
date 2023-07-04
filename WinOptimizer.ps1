@@ -146,7 +146,7 @@ Write-Host "Disabling Telemetry."
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
             Disable-ScheduledTask -TaskName "Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" | Out-Null
             
-            # Forced to use psexec to start powershell as SYSTEM, otherwise the following line fails with permission denied error.
+            # Forced to use psexec to start powershell as SYSTEM, otherwise the following commands fail with permission denied error.
             psexec.exe -i -s powershell.exe -Command "Disable-ScheduledTask -TaskName Microsoft\Windows\'Application Experience'\SdbinstMergeDbTask"
             psexec.exe -i -s powershell.exe -Command "Disable-ScheduledTask -TaskName Microsoft\Windows\'Application Experience'\PcaPatchDbTask"
             Disable-ScheduledTask -TaskName "Microsoft\Windows\Application Experience\StartupAppTask" | Out-Null
