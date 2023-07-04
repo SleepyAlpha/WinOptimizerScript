@@ -289,7 +289,6 @@ $Bloatware = @(
                 "Microsoft.ScreenSketch"
                 "Microsoft.MixedReality.Portal"
                 "Microsoft.ZuneMusic"
-                "Microsoft.ZuneVideo"
                 "Microsoft.YourPhone"
                 "Microsoft.Getstarted"
                 "Microsoft.MicrosoftOfficeHub"
