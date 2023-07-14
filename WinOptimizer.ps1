@@ -1,4 +1,4 @@
-# WinOptimizer 23.3.1
+# WinOptimizer 23.7.1
 # Big shoutout to Chris Titus for providing much of the code used in this project.
 # https://christitus.com/ | https://github.com/ChrisTitusTech | https://www.youtube.com/c/ChrisTitusTech
 
@@ -12,14 +12,8 @@ Write-Host "Installing Dependencies"
             winget source reset --force
             foreach ($Dep in $Deps){
                     Write-Host "Installing $Dep."
-		            winget install $Dep --silent --accept-package-agreements --accept-source-agreements
+		    winget install $Dep --silent --accept-package-agreements --accept-source-agreements
         }
-
-Write-Host  "Disabling Bing Search"
-            If (!(Test-Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer")) {
-                 New-Item -Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer" -Force
-            }
-            Set-ItemProperty -Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer" -Name "DisableSearchBoxSuggestions" -Type DWord -Value 1
 
 Write-Host  "Enabling Windows 11 Education Themes"
             If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\Education")) {
@@ -46,22 +40,9 @@ Write-Host "Disabling Activity History."
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "PublishUserActivities" -Type DWord -Value 0
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "UploadUserActivities" -Type DWord -Value 0
 
-Write-Host "Disabling Hibernation."
-            Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Power" -Name "HibernateEnabled" -Type Dword -Value 0
-            If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings")) {
-                New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" | Out-Null
-            }
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" -Name "ShowHibernateOption" -Type Dword -Value 0
-
-Write-Host "Setting Classic Right-Click Menu..."
-            New-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" -Name "InprocServer32" -force -value ""
-
 Write-Host "Setting DNS to anti-malware Cloud Flare for all connections."
             Get-NetAdapter | set-DnsClientServerAddress -ServerAddresses ("1.1.1.2","1.0.0.2")
             Get-NetAdapter | set-DnsClientServerAddress -ServerAddresses ("2606:4700:4700::1112", "2606:4700:4700::1002")
-
-Write-Host "Disabling automatic Maps updates."
-            Set-ItemProperty -Path "HKLM:\SYSTEM\Maps" -Name "AutoUpdateEnabled" -Type DWord -Value 0
 
 $Services = @(
                 "ALG"                                          # Application Layer Gateway Service(Provides support for 3rd party protocol plug-ins for Internet Connection Sharing)
@@ -206,21 +187,6 @@ Write-Host "Disabling Remote Assistance."
 Write-Host "Changing default Explorer view to This PC."
             Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "LaunchTo" -Type DWord -Value 1
         
-               ## Performance Tweaks and More Telemetry
-               Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSearching" -Name "SearchOrderConfig" -Type DWord -Value 0
-               Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" -Name "SystemResponsiveness" -Type DWord -Value 0
-               Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "MenuShowDelay" -Type DWord -Value 1
-               Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "AutoEndTasks" -Type DWord -Value 1
-               Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseHoverTime" -Type DWord -Value 400
-
-            # Network Tweaks
-            Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -Name "IRPStackSize" -Type DWord -Value 20
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" -Name "NetworkThrottlingIndex" -Type DWord -Value 4294967295
-
-            # Gaming Tweaks
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" -Name "Priority" -Type DWord -Value 6
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" -Name "Scheduling Category" -Type String -Value "High"
-        
             # Group svchost.exe processes
             $ram = (Get-CimInstance -ClassName Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1kb
             Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "SvcHostSplitThresholdInKB" -Type DWord -Value $ram -Force
@@ -236,19 +202,9 @@ Write-Host "Stopping and disabling Diagnostics Tracking Service."
             Stop-Service "DiagTrack"
             Set-Service "DiagTrack" -StartupType Disabled
 
-Write-Host "Disabling Wi-Fi Sense."
-            If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting")) {
-                 New-Item -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting" -Force | Out-Null
-            }
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting" -Name "Value" -Type DWord -Value 0
-            If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots")) {
-            New-Item -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots" -Force | Out-Null
-            }
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots" -Name "Value" -Type DWord -Value 0
-
 $Bloatware = @(
                 "Microsoft.WindowsCamera"
-		        "Microsoft.549981C3F5F10"
+		"Microsoft.549981C3F5F10"
                 "Microsoft.3DBuilder"
                 "Microsoft.Microsoft3DViewer"
                 "Microsoft.AppConnector"
@@ -288,7 +244,6 @@ $Bloatware = @(
                 "Microsoft.CommsPhone"
                 "Microsoft.ScreenSketch"
                 "Microsoft.MixedReality.Portal"
-                "Microsoft.ZuneMusic"
                 "Microsoft.YourPhone"
                 "Microsoft.Getstarted"
                 "Microsoft.MicrosoftOfficeHub"
@@ -299,12 +254,12 @@ $Bloatware = @(
                 "*Microsoft.Advertising.Xaml*"
                 "*Microsoft.MSPaint*"
                 "*Microsoft.MicrosoftStickyNotes*"
-		        "*MicrosoftCorporationII.QuickAssist*"
-		        "*Microsoft.PowerAutomateDesktop*"
+		"*MicrosoftCorporationII.QuickAssist*"
+		"*Microsoft.PowerAutomateDesktop*"
                 "*Microsoft.TCUI*"
-                "*Microsoft.XboxGameCallableUI*"
                 "*Microsoft.XboxSpeechToTextOverlay*"
                 "*Microsoft.XboxGamingOverlay*"
+		"*WebExperience*"
             )
 
 Write-Host "Removing Bloatware."
@@ -313,10 +268,6 @@ Write-Host "Removing Bloatware."
                 Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online
                 Write-Host "Trying to remove $Bloat."
             }
-
-Write-Host "Removing Widgets."
-		    winget uninstall "Windows web experience Pack"
-
 
 Write-Host "Disabling mouse acceleration."
             Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseSpeed" -Type String -Value 0
