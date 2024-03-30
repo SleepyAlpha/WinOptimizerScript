@@ -1,8 +1,6 @@
-# WinOptimizer 23.7.1
+# WinOptimizer 24.3.1
 # Big shoutout to Chris Titus for providing much of the code used in this project.
 # https://christitus.com/ | https://github.com/ChrisTitusTech | https://www.youtube.com/c/ChrisTitusTech
-
-Read-Host -Prompt "WARNING: The Computer Will Reboot When Execution Concludes, Press Enter to Continue"
 
 $Deps = @(
             "9P7KNL5RWT25"  # Sysinternals Suite
@@ -15,30 +13,37 @@ Write-Host "Installing Dependencies"
 		    winget install $Dep --silent --accept-package-agreements --accept-source-agreements
         }
 
-Write-Host  "Enabling Windows 11 Education Themes"
-            If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\Education")) {
-                 New-Item -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\Education" -Force
-            }
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\Education" -Name "EnableEduThemes" -Type DWord -Value 1
+Write-Host "Disabling Telemetry."
+            Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
+	    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\SearchSettings" -Name "IsMSACloudSearchEnabled" -Type DWord -Value 0 -Force
+	    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\SearchSettings" -Name "IsAADCloudSearchEnabled" -Type DWord -Value 0 -Force
+            Stop-Service "DiagTrack" -WarningAction SilentlyContinue
+            Set-Service "DiagTrack" -StartupType Disabled
 
-Write-Host "Disabling GameDVR"
-            If (!(Test-Path "HKCU:\System\GameConfigStore")) {
-                 New-Item -Path "HKCU:\System\GameConfigStore" -Force
-            }
-            Set-ItemProperty -Path "HKCU:\System\GameConfigStore" -Name "GameDVR_DXGIHonorFSEWindowsCompatible" -Type DWord -Value 1
-            Set-ItemProperty -Path "HKCU:\System\GameConfigStore" -Name "GameDVR_HonorUserFSEBehaviorMode" -Type DWord -Value 1
-            Set-ItemProperty -Path "HKCU:\System\GameConfigStore" -Name "GameDVR_EFSEFeatureFlags" -Type DWord -Value 0
-            Set-ItemProperty -Path "HKCU:\System\GameConfigStore" -Name "GameDVR_Enabled" -Type DWord -Value 0
-            Set-ItemProperty -Path "HKCU:\System\GameConfigStore" -Name "GameDVR_FSEBehavior" -Type DWord -Value 2
-            If (!(Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR")) {
-                New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR" -Force
-            }
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR" -Name "AllowGameDVR" -Type DWord -Value 0
+            # Forced to use psexec to start powershell as SYSTEM, otherwise the following commands fail with permission denied error.
+            psexec.exe -i -s powershell.exe -Command "Disable-ScheduledTask -TaskName Microsoft\Windows\'Application Experience'\'Microsoft Compatibility Appraiser'"
+            psexec.exe -i -s powershell.exe -Command "Disable-ScheduledTask -TaskName Microsoft\Windows\'Application Experience'\PcaPatchDbTask"
+            psexec.exe -i -s powershell.exe -Command "Disable-ScheduledTask -TaskName Microsoft\Windows\'Application Experience'\StartupAppTask"
+            psexec.exe -i -s powershell.exe -Command "Disable-ScheduledTask -TaskName Microsoft\Windows\'Customer Experience Improvement Program'\Consolidator"
+            psexec.exe -i -s powershell.exe -Command "Disable-ScheduledTask -TaskName Microsoft\Windows\'Customer Experience Improvement Program'\UsbCeip"
 
 Write-Host "Disabling Activity History."
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "EnableActivityFeed" -Type DWord -Value 0
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "PublishUserActivities" -Type DWord -Value 0
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "UploadUserActivities" -Type DWord -Value 0
+
+Write-Host "Disabling Camera and Location Access."
+	    Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" -Name "Value" -Type String -Value "Deny" -Force
+	    Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" -Name "Value" -Type String -Value "Deny" -Force
+
+Write-Host "Disabling Ink and Text Collection."
+	    Set-ItemProperty -Path "HKCU:\Software\Microsoft\InputPersonalization" -Name "RestrictImplicitInkCollection" -Type Dword -Value "1" -Force
+	    Set-ItemProperty -Path "HKCU:\Software\Microsoft\InputPersonalization" -Name "RestrictImplicitTextCollection" -Type Dword -Value "1" -Force
+	    Set-ItemProperty -Path "HKCU:\Software\Microsoft\InputPersonalization\TrainedDataStore" -Name "HarvestContacts" -Type Dword -Value "0" -Force
+	    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Personalization\Settings" -Name "AcceptedPrivacyPolicy" -Type Dword -Value "0" -Force
+
+Write-Host "Disabling Bing Web Search."
+	    Set-ItemProperty -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows" -Name "DisableSearchBoxSuggestions" -Type Dword -Value "1" -Force
+	    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\SearchSettings" -Name "IsDynamicSearchBoxEnabled" -Type DWord -Value 0 -Force
 
 Write-Host "Setting DNS to anti-malware Cloud Flare for all connections."
             Get-NetAdapter | set-DnsClientServerAddress -ServerAddresses ("1.1.1.2","1.0.0.2")
@@ -122,85 +127,8 @@ $Services = @(
                 Get-Service -Name $Service -ErrorAction SilentlyContinue | Set-Service -StartupType Manual
             }
 
-Write-Host "Disabling Telemetry."
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
-            Disable-ScheduledTask -TaskName "Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" | Out-Null
-            
-            # Forced to use psexec to start powershell as SYSTEM, otherwise the following commands fail with permission denied error.
-            psexec.exe -i -s powershell.exe -Command "Disable-ScheduledTask -TaskName Microsoft\Windows\'Application Experience'\SdbinstMergeDbTask"
-            psexec.exe -i -s powershell.exe -Command "Disable-ScheduledTask -TaskName Microsoft\Windows\'Application Experience'\PcaPatchDbTask"
-            Disable-ScheduledTask -TaskName "Microsoft\Windows\Application Experience\StartupAppTask" | Out-Null
-            Disable-ScheduledTask -TaskName "Microsoft\Windows\Autochk\Proxy" | Out-Null
-            Disable-ScheduledTask -TaskName "Microsoft\Windows\Customer Experience Improvement Program\Consolidator" | Out-Null
-            Disable-ScheduledTask -TaskName "Microsoft\Windows\Customer Experience Improvement Program\UsbCeip" | Out-Null
-            Disable-ScheduledTask -TaskName "Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector" | Out-Null
-
-Write-Host "Disabling Application suggestions."
-            Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "OemPreInstalledAppsEnabled" -Type DWord -Value 0
-            Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "PreInstalledAppsEnabled" -Type DWord -Value 0
-            Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "PreInstalledAppsEverEnabled" -Type DWord -Value 0
-            Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SilentInstalledAppsEnabled" -Type DWord -Value 0
-            Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SystemPaneSuggestionsEnabled" -Type DWord -Value 0
-            
-            If (!(Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent")) {
-                New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Force | Out-Null
-            }
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsConsumerFeatures" -Type DWord -Value 0
-
-Write-Host "Disabling Feedback."
-            If (!(Test-Path "HKCU:\SOFTWARE\Microsoft\Siuf\Rules")) {
-                New-Item -Path "HKCU:\SOFTWARE\Microsoft\Siuf\Rules" -Force | Out-Null
-            }
-            Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Siuf\Rules" -Name "NumberOfSIUFInPeriod" -Type DWord -Value 0
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "DoNotShowFeedbackNotifications" -Type DWord -Value 1
-            Disable-ScheduledTask -TaskName "Microsoft\Windows\Feedback\Siuf\DmClient" -ErrorAction SilentlyContinue | Out-Null
-            Disable-ScheduledTask -TaskName "Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload" -ErrorAction SilentlyContinue | Out-Null
-
-Write-Host "Disabling Tailored Experiences."
-            If (!(Test-Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent")) {
-                New-Item -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Force | Out-Null
-            }
-            Set-ItemProperty -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableTailoredExperiencesWithDiagnosticData" -Type DWord -Value 1
-
-Write-Host "Disabling Advertising ID."
-            If (!(Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo")) {
-                New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" | Out-Null
-            }
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" -Name "DisabledByGroupPolicy" -Type DWord -Value 1
-
-Write-Host "Disabling Error reporting."
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting" -Name "Disabled" -Type DWord -Value 1
-            Disable-ScheduledTask -TaskName "Microsoft\Windows\Windows Error Reporting\QueueReporting" | Out-Null
-
-Write-Host "Stopping and disabling Diagnostics Tracking Service."
-            Stop-Service "DiagTrack" -WarningAction SilentlyContinue
-            Set-Service "DiagTrack" -StartupType Disabled
-
-Write-Host "Stopping and disabling WAP Push Service."
-            Stop-Service "dmwappushservice" -WarningAction SilentlyContinue
-            Set-Service "dmwappushservice" -StartupType Disabled
-
-Write-Host "Disabling Remote Assistance."
-            Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance" -Name "fAllowToGetHelp" -Type DWord -Value 0
-
 Write-Host "Changing default Explorer view to This PC."
             Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "LaunchTo" -Type DWord -Value 1
-        
-            # Group svchost.exe processes
-            $ram = (Get-CimInstance -ClassName Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1kb
-            Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "SvcHostSplitThresholdInKB" -Type DWord -Value $ram -Force
-
-Write-Host "Removing AutoLogger file and restricting directory."
-            $autoLoggerDir = "$env:PROGRAMDATA\Microsoft\Diagnosis\ETLLogs\AutoLogger"
-            If (Test-Path "$autoLoggerDir\AutoLogger-Diagtrack-Listener.etl") {
-                Remove-Item "$autoLoggerDir\AutoLogger-Diagtrack-Listener.etl"
-            }
-            icacls $autoLoggerDir /deny SYSTEM:`(OI`)`(CI`)F | Out-Null
-
-Write-Host "Stopping and disabling Diagnostics Tracking Service."
-            Stop-Service "DiagTrack"
-            Set-Service "DiagTrack" -StartupType Disabled
 
 $Bloatware = @(
                 "Microsoft.WindowsCamera"
@@ -256,10 +184,8 @@ $Bloatware = @(
                 "*Microsoft.MicrosoftStickyNotes*"
 		"*MicrosoftCorporationII.QuickAssist*"
 		"*Microsoft.PowerAutomateDesktop*"
-                "*Microsoft.TCUI*"
-                "*Microsoft.XboxSpeechToTextOverlay*"
-                "*Microsoft.XboxGamingOverlay*"
 		"*WebExperience*"
+		"*Microsoft.OneDrive*"
             )
 
 Write-Host "Removing Bloatware."
@@ -268,6 +194,9 @@ Write-Host "Removing Bloatware."
                 Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online
                 Write-Host "Trying to remove $Bloat."
             }
+
+Write-Host "Disabling Multi-Plane Overlay."
+            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\Dwm" -Name "OverlayTestMode" -Type Dword -Value 5
 
 Write-Host "Disabling mouse acceleration."
             Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseSpeed" -Type String -Value 0
@@ -458,12 +387,7 @@ Write-Host "Removing Dependencies."
                 winget uninstall $Dep
             }
 
-Write-Host "Disabling Multi-Plane Overlay."
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\Dwm" -Name "OverlayTestMode" -Type Dword -Value 5
-
 Write-Host "Cleaning Windows."
                 Get-ChildItem -Path "C:\Windows\Temp" *.* -Recurse | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
                 Get-ChildItem -Path $env:TEMP *.* -Recurse | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
                 cmd /c cleanmgr.exe /d C: /VERYLOWDISK
-
-Restart-Computer -Force
